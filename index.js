@@ -83,7 +83,7 @@ async function run() {
         const singleOrder = orderCollection.find({});
         const orders = await singleOrder.toArray();
         const customerOrder = orders.filter(
-          (mail) => (mail.email = email)
+          (mail) => (mail.email === email)
         );
         res.send(customerOrder);
       });
