@@ -46,6 +46,21 @@ async function run() {
         res.send(food);
       });
 
+      // Update Product Data
+      app.put("/products/:id", async (req, res) => {
+        const updateProduct = req.body;
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const option = { upsert: true };
+        const updateDoc = { $set: { updateProduct } };
+        const result = await productCollection.updateOne(
+          query,
+          updateDoc,
+          option
+        );
+        res.json(result);
+      });
+
       // delete
       app.delete("/products/:id", async (req, res) => {
         const id = req.params.id;
@@ -55,8 +70,15 @@ async function run() {
       });
 
       // Order Section
-       // get order by email
-       app.get("/orders/:email", async (req, res) => {
+      // post order
+      app.post("/orders", async (req, res) => {
+        const order = req.body;
+        const result = await orderCollection.insertOne(order);
+        res.json(result);
+      });
+
+      // get order by email
+      app.get("/orders/:email", async (req, res) => {
         const email = req.params.email;
         const singleOrder = orderCollection.find({});
         const orders = await singleOrder.toArray();
@@ -66,31 +88,20 @@ async function run() {
         res.send(customerOrder);
       });
 
-                    // get Single Order
-                    app.get("/orders/:id", async (req, res) => {
-                        const id = req.params.id;
-                        const query = { id: ObjectId(id) };
-                        const order = await orderCollection.findOne(query);
-                        res.json(order);
-                      });
-        
+      // get Single Order
+      app.get("/orders/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { id: ObjectId(id) };
+        const order = await orderCollection.findOne(query);
+        res.json(order);
+      });
+
       // get all order
       app.get("/orders", async (req, res) => {
         const cursor = orderCollection.find({});
         const result = await cursor.toArray();
         res.json(result);
       });
-
-      // post order
-      app.post("/orders", async (req, res) => {
-        const order = req.body;
-        const result = await orderCollection.insertOne(order);
-        res.json(result);
-      });
-        
-    
-
-     
 
       // delete specefic order
       app.delete("/orders/:id", async (req, res) => {
@@ -99,8 +110,6 @@ async function run() {
         const deleteOrder = await orderCollection.deleteOne(query);
         res.json(deleteOrder);
       });
-        
-     
 
       // update Order
       app.put("/orders/:id", async (req, res) => {
@@ -120,8 +129,6 @@ async function run() {
         );
         res.json(acceptstatus);
       });
-        
-   
 
       // userSection
       // post user
@@ -154,6 +161,14 @@ async function run() {
         );
         res.json(result);
       });
+
+      // get All User
+      app.get('/users', async (req, res) => {
+        const users = usersCollection.find({});
+        const result = await users.toArray();
+        res.json(result);
+      })
+      
 
       // admin filtering
       app.get("/users/:email", async (req, res) => {
